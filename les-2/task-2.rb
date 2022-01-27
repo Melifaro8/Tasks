@@ -1,8 +1,8 @@
-my_array = (10..100)
+my_range = (10..100)
 
 multiplefive = []
 
-for item in my_array do
+for item in my_range do
   if item%5 == 0
     multiplefive << item
   end

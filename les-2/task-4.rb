@@ -1,5 +1,5 @@
-string_AZ = Hash[("a".."z").to_a.zip((1..26).to_a)]
+string_az = Hash[("a".."z").to_a.zip((1..26).to_a)]
 
-st_AY = string_AZ.select { |k, v| k == "a" || k == "e" || k == "i" || k == "o" || k == "u" || k == "y"}
+st_ay = string_az.select { |k, _| [ "a", "e", "i", "o", "u", "y"].include?(k) }
 
-puts st_AY
+puts st_ay
