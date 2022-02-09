@@ -20,11 +20,11 @@ class Station
   def show_trains
     pass_trains= self.train_list.select {|train| train.type == "pass"} 
     pass_trains.each do |train|
-    puts "Passenger trains: #{train.num}"
+    train.num
     end
     cargo_trains= self.train_list.select {|train| train.type == "cargo"} 
     cargo_trains.each do |train|
-    puts "Cargo trains: #{train.num}"
+    train.num
     end
   end  
 end
@@ -32,7 +32,7 @@ end
 
 class Route
   
-  attr_reader :start_station, :final_station
+  attr_reader :start_station, :final_station, :full_route
   attr_reader :way_station
 
   def initialize(start, final)
@@ -49,9 +49,6 @@ class Route
 # Выводит маршрут со всеми станциями в одном массиве
   def full_route
     @full_route= [start_station, way_station, final_station].flatten
-    @full_route.each do |station|
-      puts station.station_name
-    end
   end
 
 # Удаляет станцию из маршрута
@@ -69,7 +66,6 @@ class Train
     @speed = speed
     @vans = vans
     @type = type
-    @current_station 
     @train_route=[]
   end
 
@@ -100,34 +96,37 @@ class Train
 
 # Принимает маршрут следования и перемещает поезд на первую станцию маршрута
   def get_route(route)
-    @train_route = route.full_route
+    @train_route = route
     @current_station = route.full_route[0]
-    self.current_station.train_list << self 
-
+    @current_station.train_list << self 
   end
 
 # Отправляет на станцию вперед
   def move_ahead
     self.current_station.train_list.delete(self)
-    cur_st = self.train_route.index(current_station)
-    @current_station = self.train_route[cur_st + 1]
+    cur_st = self.train_route.full_route.index(current_station)
+    @current_station = self.train_route.full_route[cur_st + 1]
     self.current_station.train_list << self 
   end
 
 # Отправляет поезд на станцию назад
   def move_back
     self.current_station.train_list.delete(self)
-    cur_st = self.train_route.index(current_station)
-    @current_station = self.train_route[cur_st - 1]
+    cur_st = self.train_route.full_route.index(current_station)
+    @current_station = self.train_route.full_route[cur_st - 1]
     self.current_station.train_list << self 
   end
 
-# Возвращает предыдущую, текущую и следующую станцию на маршруте
-  def part_route
-    cur_st = self.train_route.index(current_station)
-    previous_st = self.train_route[cur_st - 1]
-    cur_station = self.train_route[cur_st] 
-    next_st = self.train_route[cur_st + 1]
-    puts " previous station: #{previous_st.station_name}, current station: #{cur_station.station_name}, next station: #{next_st.station_name}"
+# Возвращает предыдущую станцию на маршруте
+  def previous_station
+    cur_st = self.train_route.full_route.index(current_station)
+    previous_station = self.train_route.full_route[cur_st - 1]
+  end
+# Возвращает следующую станцию на маршруте
+  def next_station
+    cur_st = self.train_route.full_route.index(current_station)
+    previous_station = self.train_route.full_route[cur_st + 1]
   end
 end
+
+
