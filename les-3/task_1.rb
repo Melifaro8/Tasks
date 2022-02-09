@@ -54,7 +54,7 @@ class Route
     end
   end
 
-# Удаляет станцию из маршрута (НЕ РАБОТАЕТ!!!)
+# Удаляет станцию из маршрута
   def remove_station(station)
     self.way_station.delete(station)
   end
@@ -74,32 +74,28 @@ class Train
   end
 
 # Набирает скорость
-  def go= (speed)
+  def go (speed)
     @speed = speed
   end
 
 # Останавлиает поезд
   def stop
-    self.speed = 0
+    @speed = 0
   end 
 
 # Прицепить вагон
   def plus_van 
-    if speed == 0 
-    vans = vans + 1
-    end
+    vans = vans + 1 if speed == 0 
   end
 
 # Отцепить вагон
   def minus_van 
-    if speed == 0 
-    vans = vans - 1
-    end
+    vans = vans - 1 if speed == 0 
   end
 
 # Возвращает количество вагонов
   def vans_num
-    self.vans
+    @vans
   end    
 
 # Принимает маршрут следования и перемещает поезд на первую станцию маршрута
@@ -126,7 +122,7 @@ class Train
     self.current_station.train_list << self 
   end
 
-# Возвращает предыдущую, текущую и следующую станцию на маршруте (НЕ РАБОТАЕТ, НУЖНО ПРАВИЛЬНО ПРОПИСАТЬ ИТЕРАЦИЮ)
+# Возвращает предыдущую, текущую и следующую станцию на маршруте
   def part_route
     cur_st = self.train_route.index(current_station)
     previous_st = self.train_route[cur_st - 1]
