@@ -1,6 +1,6 @@
 class Station
-  attr_reader :train_list
-  attr_accessor :station_name
+  attr_reader :train_list, :station_name
+
   def initialize(station_name)
     @station_name = station_name
     @train_list = []
@@ -17,15 +17,8 @@ class Station
   end
   
 # Возвращает список поездов на станции по типу
-  def show_trains
-    pass_trains= self.train_list.select {|train| train.type == "pass"} 
-    pass_trains.each do |train|
-    train.num
-    end
-    cargo_trains= self.train_list.select {|train| train.type == "cargo"} 
-    cargo_trains.each do |train|
-    train.num
-    end
+  def trains_by(type)
+    self.train_list.select {|train| train.type == type} 
   end  
 end
 
@@ -66,7 +59,6 @@ class Train
     @speed = speed
     @vans = vans
     @type = type
-    @train_route=[]
   end
 
 # Набирает скорость
@@ -81,12 +73,12 @@ class Train
 
 # Прицепить вагон
   def plus_van 
-    vans = vans + 1 if speed == 0 
+    @vans += 1 if speed.zero?
   end
 
 # Отцепить вагон
   def minus_van 
-    vans = vans - 1 if speed == 0 
+    @vans -= 1 if speed.zero?
   end
 
 # Возвращает количество вагонов
@@ -103,29 +95,35 @@ class Train
 
 # Отправляет на станцию вперед
   def move_ahead
+    if @current_station != self.train_route.full_route[-1]  then
     self.current_station.train_list.delete(self)
-    cur_st = self.train_route.full_route.index(current_station)
-    @current_station = self.train_route.full_route[cur_st + 1]
+    @current_station = next_station
     self.current_station.train_list << self 
+    else
+     self.current_station
+    end
   end
 
 # Отправляет поезд на станцию назад
   def move_back
+    if @current_station != self.train_route.full_route[0]  then
     self.current_station.train_list.delete(self)
-    cur_st = self.train_route.full_route.index(current_station)
-    @current_station = self.train_route.full_route[cur_st - 1]
+    @current_station = previous_station 
     self.current_station.train_list << self 
+    else
+      self.current_station
+    end
   end
 
 # Возвращает предыдущую станцию на маршруте
   def previous_station
     cur_st = self.train_route.full_route.index(current_station)
-    previous_station = self.train_route.full_route[cur_st - 1]
+    self.train_route.full_route[cur_st - 1]
   end
 # Возвращает следующую станцию на маршруте
   def next_station
     cur_st = self.train_route.full_route.index(current_station)
-    previous_station = self.train_route.full_route[cur_st + 1]
+    self.train_route.full_route[cur_st + 1]
   end
 end
 
