@@ -18,7 +18,7 @@ class Station
   
 # Возвращает список поездов на станции по типу
   def trains_by(type)
-    self.train_list.select {|train| train.type == type} 
+    self.train_list.select {|train| train.type == type}
   end  
 end
 
@@ -95,35 +95,33 @@ class Train
 
 # Отправляет на станцию вперед
   def move_ahead
-    if @current_station != self.train_route.full_route[-1]  then
+    return unless next_station
     self.current_station.train_list.delete(self)
     @current_station = next_station
     self.current_station.train_list << self 
-    else
-     self.current_station
-    end
   end
 
 # Отправляет поезд на станцию назад
   def move_back
-    if @current_station != self.train_route.full_route[0]  then
+    return unless previous_station
     self.current_station.train_list.delete(self)
     @current_station = previous_station 
     self.current_station.train_list << self 
-    else
-      self.current_station
-    end
   end
 
 # Возвращает предыдущую станцию на маршруте
   def previous_station
-    cur_st = self.train_route.full_route.index(current_station)
-    self.train_route.full_route[cur_st - 1]
+    if @current_station != self.train_route.full_route[0]
+      cur_st = self.train_route.full_route.index(current_station)
+      self.train_route.full_route[cur_st - 1]
+    end
   end
 # Возвращает следующую станцию на маршруте
   def next_station
-    cur_st = self.train_route.full_route.index(current_station)
-    self.train_route.full_route[cur_st + 1]
+    if @current_station != self.train_route.full_route[-1]  
+      cur_st = self.train_route.full_route.index(current_station)
+      self.train_route.full_route[cur_st + 1]
+    end
   end
 end
 
