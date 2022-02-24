@@ -1,9 +1,21 @@
+require_relative 'modules'
+
 class Station
   attr_reader :train_list, :name
 
+  @@station_list = []
+
+  def self.all
+    @@station_list.each do |station|
+      puts station.name
+    end
+  end
+
   def initialize(name)
+    register_instance
     @name = name
     @train_list = []
+    @@station_list<<self
   end 
   
   # прибытие поезда на станцию

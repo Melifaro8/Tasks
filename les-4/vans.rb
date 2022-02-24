@@ -1,4 +1,7 @@
+require_relative 'modules'
+
 class Van
+  include Factory
   attr_reader :num, :type
 
   def initialize(num)

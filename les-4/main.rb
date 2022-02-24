@@ -2,6 +2,7 @@ require_relative 'station'
 require_relative 'train'
 require_relative 'route'
 require_relative 'vans'
+require_relative 'modules'
 
 class RailRoad 
   attr_reader :stations, :trains, :routes, :vans 
@@ -33,7 +34,7 @@ class RailRoad
   end
   
 
-  private
+  #private
 
   def separation
     puts "================================================================"
@@ -321,7 +322,6 @@ class RailRoad
     puts "1. Станция."
     puts "2. Поезд."
     puts "3. Маршрут."
-    puts "4. Вагон."
     input = gets.chomp.to_i
 
     case input
@@ -357,7 +357,7 @@ class RailRoad
     end    
   end
    
-=begin
+
   def seed
     @stations << Station.new('Москва')
     @stations << Station.new('Самара')
@@ -379,5 +379,4 @@ class RailRoad
     @trains[0].add_van(@vans[3])
     @stations[0].add_train(@trains[1])
   end
-=end
 end

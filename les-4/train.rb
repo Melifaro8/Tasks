@@ -1,10 +1,24 @@
+require_relative 'modules'
+
 class Train
+  include Factory
+  include InstanceCounter
   attr_reader :speed, :vans, :type, :get_route, :train_route, :current_station, :num
 
+  @@train_list = []
+
+  def self.find(number)
+    @@train_list.find do |train|
+      puts train if train.num.equal?(number)
+    end
+  end
+
   def initialize(num, speed = 0)
+    register_instance
     @num = num
     @speed = speed
     @vans =[]
+    @@train_list<<self
   end
 
 # Набирает скорость
