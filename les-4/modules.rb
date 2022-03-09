@@ -18,7 +18,7 @@ module InstanceCounter
 
    module InstanceMethods
 
-    protected
+protected
 
     def register_instance
       self.class.instances

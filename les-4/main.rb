@@ -7,6 +7,8 @@ require_relative 'modules'
 class RailRoad 
   attr_reader :stations, :trains, :routes, :vans 
 
+  @@attempt = 0
+
   def initialize
     @stations= []
     @trains = []
@@ -36,36 +38,28 @@ class RailRoad
 
   #private
 
-  def separation
-    puts "================================================================"
-  end
-
   def station_list
     @stations.each.with_index do |station, index|
     puts "#{index + 1}. #{station.name}"
     end
-    separation
   end
 
   def trains_list
     @trains.each.with_index do |train, index|
     puts "#{index + 1}. #{train.num}, #{train.type}"
     end
-    separation
   end
 
   def route_list
     @routes.each.with_index do |route, index|
     puts "#{index + 1}. маршрут от #{route.start_station.name} до #{route.final_station.name}"
     end
-    separation
   end
 
   def van_list
     @vans.each.with_index do |van, index|
       puts "#{index + 1}. вагон номер #{van.num}, #{van.type}"
     end
-    separation
   end
   
 
@@ -90,10 +84,14 @@ class RailRoad
 
   def create_station
     puts "Введите название станции: "
-    input = gets.chomp.to_s.capitalize 
-    @stations << Station.new(input)
-    puts "Создана станция #{input}"
-    separation
+    name = gets.chomp.to_s.capitalize 
+    @stations << Station.new(name)
+  rescue RuntimeError => e
+    puts e.class.name
+    puts e.message
+    @@attempt += 1
+    puts "Попробуйте ввести название станции заново"
+    retry if @@attempt < 1
   end
 
   def create_train
@@ -104,17 +102,19 @@ class RailRoad
     case input
       when 1
         puts "Введите номер поезда"
-        num=gets.chomp.to_i 
+        num=gets.chomp.to_s
         @trains << PassengerTrain.new(num)
-        puts "Создан пассажирский поезд номер: #{num}"
-        separation
       when 2
         puts "Введите номер поезда"
-        num=gets.chomp.to_i 
+        num=gets.chomp.to_s
         @trains << CargoTrain.new(num)
-        puts "Создан грузовой поезд номер: #{num}"
-        separation
     end
+  rescue => e
+    puts e.message
+    puts e.class.name
+    @@attempt += 1
+    puts "Попробуйте ввести номер поезда заново"
+    retry if @@attempt < 1
   end
 
   def create_route
@@ -125,8 +125,10 @@ class RailRoad
       puts "Введите номер конечной станции: "
       final_st = gets.chomp.to_i
       @routes << Route.new(@stations[start_st - 1], @stations[final_st - 1])
-      puts "Создан маршрут от #{stations[start_st-1].name} до #{stations[final_st - 1].name}"
-      separation
+    rescue 
+      @@attempt += 1
+      puts "Попробуйте выбрать маршрут заново"
+    retry if @@attempt < 1
   end
 
   def create_van
@@ -139,15 +141,15 @@ class RailRoad
         puts "Введите номер вагона: "
         num= gets.chomp.to_i
         @vans << PassengerVan.new(num)
-        puts "Создан пассажирский вагон номер #{num}"
-        separation
       when 2
         puts "Введите номер вагона: "
         num= gets.chomp.to_i
         @vans << CargoVan.new(num)
-        puts "Создан грузовой вагон номер #{num}"
-        separation
     end
+  rescue 
+    @@attempt += 1
+    puts "Попробуйте ввести номер вагона заново"
+    retry if @@attempt < 1
   end
 
   def operate_object
@@ -172,20 +174,17 @@ class RailRoad
     puts "3. Вывести список поездов на станции"
     input = gets.chomp.to_i
     
-    separation
     puts station_list
     puts "Выберите станцию: "
     station_input=gets.chomp.to_i
     
     case input
       when 1
-        separation
         puts trains_list
         puts "Выберите поезд, который хотите добавить"
         train_input=gets.chomp.to_i
         @stations[station_input - 1].add_train(@trains[train_input - 1])
         puts "На станцию #{stations[station_input - 1].name} добавлен поезд номер #{@trains[train_input - 1].num}"
-        separation
       when 2
         stations[station_input - 1].train_list.each_with_index do |train, index|
         puts "#{index + 1}. #{train.num}, #{train.type}"
@@ -195,11 +194,9 @@ class RailRoad
         remove_input= gets.chomp.to_i
         @stations[station_input - 1].remove_train(@trains[remove_input - 1])
         puts "Поезд номер #{@trains[remove_input - 1].num} отправлен со станции  #{@stations[remove_input - 1].name}"
-        separation
       when 3
         @stations[station_input - 1].train_list.each_with_index do |train, index|
           puts "#{index + 1}. #{train.num}, #{train.type}"
-          separation
         end
       end
     end
@@ -339,11 +336,7 @@ class RailRoad
         puts trains_list
         puts "Выберите поезд: "
         train_input=gets.chomp.to_i
-        puts "Поезд номер: #{@trains[train_input - 1].num}, тип: #{@trains[train_input - 1].type}, текущая скорость: #{@trains[train_input - 1].speed}, вагоны: #{@trains[train_input - 1].vans.eaсн {|van| puts van.num}}, текущая станция: #{@trains[train_input - 1].current_station.name}"
-        puts "Маршрут: " 
-        @trains[train_input - 1].train_route.each do |station|
-        print station.name
-        end 
+        puts "Поезд номер: #{@trains[train_input - 1].num}, тип: #{@trains[train_input - 1].type}, текущая скорость: #{@trains[train_input - 1].speed}, вагоны: #{@trains[train_input - 1].vans.each {|van| puts van.num}}, текущая станция: #{@trains[train_input - 1].current_station.name}"
       when 3
         puts route_list
         puts "Выберите маршрут: "

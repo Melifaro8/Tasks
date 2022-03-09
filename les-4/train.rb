@@ -5,7 +5,10 @@ class Train
   include InstanceCounter
   attr_reader :speed, :vans, :type, :get_route, :train_route, :current_station, :num
 
+  TRAIN_NUMBER = /^[\w]{3}-?[\w]{2}/
   @@train_list = []
+  @@trains_number = []
+  @@attempt = 0
 
   def self.find(number)
     @@train_list.find do |train|
@@ -14,31 +17,29 @@ class Train
   end
 
   def initialize(num, speed = 0)
-    register_instance
     @num = num
     @speed = speed
     @vans =[]
+    @type = type
+    register_instance
     @@train_list<<self
+    @@trains_number<<self.num
   end
 
-# Набирает скорость
   def go (speed)
     @speed = speed
   end
 
-# Останавлиает поезд
   def stop
     @speed = 0
   end 
 
-# Принимает маршрут следования и перемещает поезд на первую станцию маршрута
   def get_route(route)
     @train_route = route
     @current_station = route.full_route[0]
     @current_station.train_list << self 
   end
 
-# Отправляет на станцию вперед
   def move_ahead
     return unless next_station
     self.current_station.train_list.delete(self)
@@ -46,7 +47,6 @@ class Train
     self.current_station.train_list << self 
   end
 
-# Отправляет поезд на станцию назад
   def move_back
     return unless previous_station
     self.current_station.train_list.delete(self)
@@ -54,14 +54,13 @@ class Train
     self.current_station.train_list << self 
   end
 
-# Возвращает предыдущую станцию на маршруте
   def previous_station
     if @current_station != self.train_route.full_route[0]
       cur_st = self.train_route.full_route.index(current_station)
       self.train_route.full_route[cur_st - 1]
     end
   end
-# Возвращает следующую станцию на маршруте
+
   def next_station
     if @current_station != self.train_route.full_route[-1]  
       cur_st = self.train_route.full_route.index(current_station)
@@ -69,35 +68,39 @@ class Train
     end
   end
 
-   # Прицепить вагон
   def add_van(van)
     @vans << van if speed.zero? && van.type == self.type
   end
   
-  # Отцепить вагон
-    def remove_van(van)
-      @vans.delete(van) if speed.zero?
-    end
+  def remove_van(van)
+    @vans.delete(van) if speed.zero?
+  end
 
+  protected
+
+  def validate!
+    raise "Не правильный формат номера поезда" if @num.to_s !~ TRAIN_NUMBER
+  end
 end
 
 
 class PassengerTrain < Train
-  attr_reader :type
+  attr_reader :type, :num
   
   def initialize(num)
     super
-    @type = "пассажирский"
+    @type = :passenger
+    validate!
   end
 end
 
 
 class CargoTrain < Train
-  attr_reader :type
+  attr_reader :type, :num
 
   def initialize(num)
     super
-    @type = "грузовой"
+    @type = :cargo
+    validate!
   end
-
 end
