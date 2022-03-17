@@ -58,7 +58,11 @@ class RailRoad
 
   def van_list
     @vans.each.with_index do |van, index|
-      puts "#{index + 1}. вагон номер #{van.num}, #{van.type}"
+      if van.type == :cargo
+        puts "#{index + 1}. вагон номер #{van.num}, тип: грузовой, объем: #{van.volume}"
+      else 
+        puts "#{index + 1}. вагон номер #{van.num}, тип: пассажирский, количество мест: #{van.seats}"
+      end
     end
   end
   
@@ -140,11 +144,15 @@ class RailRoad
       when 1
         puts "Введите номер вагона: "
         num= gets.chomp.to_i
-        @vans << PassengerVan.new(num)
+        puts "Введите количество мест: "
+        seats= gets.chomp.to_i
+        @vans << PassengerVan.new(num, seats)
       when 2
         puts "Введите номер вагона: "
         num= gets.chomp.to_i
-        @vans << CargoVan.new(num)
+        puts "Введите объем вагона: "
+        volume= gets.chomp.to_f
+        @vans << CargoVan.new(num, volume)
     end
   rescue 
     @@attempt += 1
@@ -156,6 +164,7 @@ class RailRoad
     puts "1. Произвести операции со станциями"
     puts "2. Произвести операции с поездами"
     puts "3. Произвести операции с маршрутами"
+    puts "4. Занять место иль объем в вагоне"
     input = gets.chomp.to_i
 
     case input
@@ -165,6 +174,8 @@ class RailRoad
         operate_train
       when 3
         operate_route
+      when 4
+        operate_vans
     end
   end
 
@@ -195,9 +206,7 @@ class RailRoad
         @stations[station_input - 1].remove_train(@trains[remove_input - 1])
         puts "Поезд номер #{@trains[remove_input - 1].num} отправлен со станции  #{@stations[remove_input - 1].name}"
       when 3
-        @stations[station_input - 1].train_list.each_with_index do |train, index|
-          puts "#{index + 1}. #{train.num}, #{train.type}"
-        end
+        @stations[station_input - 1].trains { |train| puts "Поезд номер: #{train.num}, тип: #{train.type}"}
       end
     end
 
@@ -214,7 +223,7 @@ class RailRoad
 
     case input
       when 1
-      set_speed
+        set_speed
       when 2
         @trains[train_input - 1].stop 
       when 3
@@ -315,10 +324,27 @@ class RailRoad
     end
   end
 
+  def operate_vans
+      puts van_list
+      puts "Выберите вагон: "
+      input = gets.chomp.to_i
+
+      if @vans[input-1].type == :cargo
+        puts "Укажите объем, который хотете занять: "
+        volume= gets.chomp.to_f
+        @vans[input-1].occupy_volume(volume)
+        puts "В грузовом вагоне №#{@vans[input-1].num} занят объем #{volume}, осталось #{@vans[input-1].free_volume}"
+      else
+        @vans[input-1].take_seat
+        puts "В пассажирском вагоне №#{@vans[input-1].num} занято одно место, свободных мест осталось: #{@vans[input-1].avaliable_seats}."
+      end 
+  end
+
   def list_object
     puts "1. Станция."
     puts "2. Поезд."
     puts "3. Маршрут."
+    puts "4. Список вагонов поезда."
     input = gets.chomp.to_i
 
     case input
@@ -328,9 +354,7 @@ class RailRoad
         station_input=gets.chomp.to_i
         puts "Станция #{@stations[station_input - 1].name}"
         puts "Поезда на станции:"
-         @stations[station_input - 1].train_list.each do |train| 
-          puts train.num
-         end 
+        @stations[station_input - 1].trains { |train| puts "Поезд номер: #{train.num}, тип: #{train.type}"}
 
       when 2
         puts trains_list
@@ -346,7 +370,14 @@ class RailRoad
           print station.name
         end
       when 4
-        puts van_list 
+        puts trains_list
+        puts "Выберите поезд: "
+        train_input=gets.chomp.to_i
+        if @trains[train_input - 1].type == :cargo
+          @trains[train_input - 1].vans_iterator {|van| puts "Вагон №#{van.num}, тип: #{van.type}, занятый объем: #{van.occupied_volume}, свободный объем: #{van.free_volume}"}
+        else  
+          @trains[train_input - 1].vans_iterator {|van| puts "Вагон №#{van.num}, тип: #{van.type}, занято мест: #{van.occupied_seats}, свободно мест: #{van.avaliable_seats}"}
+        end
     end    
   end
    
@@ -357,12 +388,12 @@ class RailRoad
     @stations << Station.new('Тамбов')
     @stations << Station.new('Воронеж')
     @stations << Station.new('Иркутск')
-    @trains << PassengerTrain.new(333)
-    @trains << CargoTrain.new(888)
-    @vans << CargoVan.new(88)
-    @vans << PassengerVan.new(34)
-    @vans << PassengerVan.new(35)
-    @vans << PassengerVan.new(36)
+    @trains << PassengerTrain.new(33333)
+    @trains << CargoTrain.new(88855)
+    @vans << CargoVan.new(88, 45)
+    @vans << PassengerVan.new(34, 80)
+    @vans << PassengerVan.new(35, 90)
+    @vans << PassengerVan.new(36, 58)
     @routes << Route.new(@stations[0], stations[1])
     @trains[0].get_route(@routes[0])
     @routes[0].add_station(@stations[2])
@@ -370,6 +401,5 @@ class RailRoad
     @trains[0].add_van(@vans[1])
     @trains[0].add_van(@vans[2])
     @trains[0].add_van(@vans[3])
-    @stations[0].add_train(@trains[1])
   end
 end

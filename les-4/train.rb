@@ -76,6 +76,14 @@ class Train
     @vans.delete(van) if speed.zero?
   end
 
+  def vans_iterator
+    if block_given?
+      @vans.each do |van|
+        yield van
+      end
+    end
+  end
+
   protected
 
   def validate!

@@ -35,6 +35,14 @@ class Station
   def trains_by(type)
     @train_list.select {|train| train.type == type}
   end  
+  
+  def trains
+    if block_given?
+      @train_list.each do |train|
+        yield train
+      end
+    end
+  end
 
   protected
 
