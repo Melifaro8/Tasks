@@ -3,13 +3,13 @@ require_relative 'modules'
 class Van
   include Factory
   attr_reader :num, :type, :seats
-  
-  @@attempt = 0
 
- protected
+  @attempt = 0
+
+  protected
 
   def validate!
-    raise "Номер не может быть 0 или иметь отрицательное значение" if num <= 0
+    raise 'Номер не может быть 0 или иметь отрицательное значение' if num <= 0
   end
 end
 
@@ -35,12 +35,11 @@ class PassengerVan < Van
 
   def message
     puts "Создан пассажирский вагон №#{@num}"
-   end
-
+  end
 end
 
 class CargoVan < Van
-  attr_reader :num, :type, :volume, :occupied_volume, :free_volume
+  attr_reader :num, :type, :volume, :occupied_volume
 
   def initialize(num, volume)
     @num = num.to_i
@@ -61,6 +60,5 @@ class CargoVan < Van
 
   def message
     puts "Создан грузовой вагон №#{@num}"
-   end
-
+  end
 end
