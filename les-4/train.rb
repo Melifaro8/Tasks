@@ -5,9 +5,11 @@ class Train
   include InstanceCounter
 
   TRAIN_NUMBER = /^\w{3}-?\w{2}/.freeze
+  # rubocop:disable Style/ClassVars
   @@train_list = []
   @@trains_number = []
   @@attempt = 0
+  # rubocop:enable Style/ClassVars
 
   attr_reader :speed, :vans, :type, :get_route, :train_route, :current_station, :num
 

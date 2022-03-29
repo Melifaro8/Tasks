@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'modules'
 
 class Station
@@ -6,7 +8,9 @@ class Station
 
   attr_reader :train_list, :name
 
+  # rubocop:disable Style/ClassVars
   @@station_list = []
+  # rubocop:enable Style/ClassVars
   @attempt = 0
 
   def self.all

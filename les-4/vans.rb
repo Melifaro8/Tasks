@@ -6,6 +6,10 @@ class Van
 
   @attempt = 0
 
+  def initialize(num, _seats = 'Unknown', _volume = 'Unknown')
+    @num = num.to_i
+  end
+
   protected
 
   def validate!
@@ -17,7 +21,7 @@ class PassengerVan < Van
   attr_reader :num, :type, :seats, :occupied_seats, :available_seats
 
   def initialize(num, seats)
-    @num = num.to_i
+    super
     @seats = seats
     validate!
     @type = :passenger
@@ -42,7 +46,7 @@ class CargoVan < Van
   attr_reader :num, :type, :volume, :occupied_volume
 
   def initialize(num, volume)
-    @num = num.to_i
+    super
     @volume = volume
     validate!
     @type = :cargo

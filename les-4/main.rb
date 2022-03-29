@@ -141,22 +141,30 @@ class RailRoad
 
     case input
     when 1
-      puts 'Введите номер вагона: '
-      num = gets.chomp.to_i
-      puts 'Введите количество мест: '
-      seats = gets.chomp.to_i
-      @vans << PassengerVan.new(num, seats)
+      create_passenger_van
     when 2
-      puts 'Введите номер вагона: '
-      num = gets.chomp.to_i
-      puts 'Введите объем вагона: '
-      volume = gets.chomp.to_f
-      @vans << CargoVan.new(num, volume)
+      create_cargo_van
     end
   rescue StandardError
     @attempt += 1
     puts 'Попробуйте ввести номер вагона заново'
     retry if @attempt < 1
+  end
+
+  def create_passenger_van
+    puts 'Введите номер вагона: '
+    num = gets.chomp.to_i
+    puts 'Введите количество мест: '
+    seats = gets.chomp.to_i
+    @vans << PassengerVan.new(num, seats)
+  end
+
+  def create_cargo_van
+    puts 'Введите номер вагона: '
+    num = gets.chomp.to_i
+    puts 'Введите объем вагона: '
+    volume = gets.chomp.to_f
+    @vans << CargoVan.new(num, volume)
   end
 
   def operate_object
@@ -190,23 +198,31 @@ class RailRoad
 
     case input
     when 1
-      puts trains_list
-      puts 'Выберите поезд, который хотите добавить'
-      choise = gets.chomp.to_i
-      @stations[station - 1].add_train(@trains[choise - 1])
-      puts "На станцию #{stations[station - 1].name} добавлен поезд номер #{@trains[choise - 1].num}"
+      add_train_to_station
     when 2
-      stations[station - 1].train_list.each_with_index do |train, index|
-        puts "#{index + 1}. #{train.num}, #{train.type}"
-      end
-
-      puts "Выберите поезд, который хотите отправить со станции #{@stations[station - 1].name}"
-      remove = gets.chomp.to_i
-      @stations[station - 1].remove_train(@trains[remove - 1])
-      puts "Поезд номер #{@trains[remove - 1].num} отправлен со станции  #{@stations[station - 1].name}"
+      go_train
     when 3
       @stations[station - 1].trains { |train| puts "Поезд номер: #{train.num}, тип: #{train.type}" }
     end
+  end
+
+  def add_train_to_station
+    puts trains_list
+    puts 'Выберите поезд, который хотите добавить'
+    choise = gets.chomp.to_i
+    @stations[station - 1].add_train(@trains[choise - 1])
+    puts "На станцию #{stations[station - 1].name} добавлен поезд номер #{@trains[choise - 1].num}"
+  end
+
+  def go_train
+    stations[station - 1].train_list.each_with_index do |train, index|
+      puts "#{index + 1}. #{train.num}, #{train.type}"
+    end
+
+    puts "Выберите поезд, который хотите отправить со станции #{@stations[station - 1].name}"
+    remove = gets.chomp.to_i
+    @stations[station - 1].remove_train(@trains[remove - 1])
+    puts "Поезд номер #{@trains[remove - 1].num} отправлен со станции  #{@stations[station - 1].name}"
   end
 
   def operate_train
@@ -223,7 +239,7 @@ class RailRoad
     when 1
       set_speed
     when 2
-      @trains[train - 1].stop
+      train_stop
     when 3
       on_route
     when 4
@@ -235,6 +251,10 @@ class RailRoad
     when 7
       remove_van
     end
+  end
+
+  def train_stop
+    @trains[train - 1].stop
   end
 
   def set_speed
@@ -254,7 +274,7 @@ class RailRoad
     puts 'выберите маршрут'
     route = gets.chomp.to_i
     @trains[train - 1].on_route(@routes[route - 1])
-    puts "Поезд #{@trains[train - 1].num} проследует по маршруту от #{@routes[route - 1].start_station.name} до #{@routes[route - 1].final_station.name} "
+    puts 'Поезд встал на маршрут'
   end
 
   def move_ahead
@@ -331,7 +351,8 @@ class RailRoad
       puts "В грузовом вагоне №#{@vans[input - 1].num} занят объем #{volume}, осталось #{@vans[input - 1].free_volume}"
     else
       @vans[input - 1].take_seat
-      puts "В пассажирском вагоне №#{@vans[input - 1].num} занято одно место, свободных мест: #{@vans[input - 1].avaliable_seats}."
+      puts "В пассажирском вагоне №#{@vans[input - 1].num} занято одно место,
+      свободных мест: #{@vans[input - 1].avaliable_seats}."
     end
   end
 
@@ -344,39 +365,53 @@ class RailRoad
 
     case input
     when 1
-      puts station_list
-      puts 'Выберите станцию: '
-      station = gets.chomp.to_i
-      puts "Станция #{@stations[station - 1].name}"
-      puts 'Поезда на станции:'
-      @stations[station - 1].trains { |train| puts "Поезд номер: #{train.num}, тип: #{train.type}" }
-
+      list_station
     when 2
-      puts trains_list
-      puts 'Выберите поезд: '
-      train = gets.chomp.to_i
-      puts "Поезд номер: #{@trains[train - 1].num}"
-      puts "тип: #{@trains[train - 1].type}"
-      puts "текущая скорость: #{@trains[train - 1].speed}"
-      puts "вагоны: #{@trains[train - 1].vans.map(&:num)}"
-
+      list_train
     when 3
-      puts route_list
-      puts 'Выберите маршрут: '
-      route = gets.chomp.to_i
-      puts "Полный маршрут: #{@routes[route - 1].full_route.map(&:name)}"
+      list_route
     when 4
-      puts trains_list
-      puts 'Выберите поезд: '
-      train = gets.chomp.to_i
-      if @trains[train - 1].type == :cargo
-        @trains[train - 1].vans_iterator do |van|
-          puts "Вагон №#{van.num}, тип: #{van.type}, занято: #{van.occupied_volume}, свободно: #{van.free_volume}"
-        end
-      else
-        @trains[train - 1].vans_iterator do |van|
-          puts "Вагон №#{van.num}, тип: #{van.type}, занято: #{van.occupied_seats}, свободно: #{van.avaliable_seats}"
-        end
+      list_vans
+    end
+  end
+
+  def list_station
+    puts station_list
+    puts 'Выберите станцию: '
+    station = gets.chomp.to_i
+    puts "Станция #{@stations[station - 1].name}"
+    puts 'Поезда на станции:'
+    @stations[station - 1].trains { |train| puts "Поезд номер: #{train.num}, тип: #{train.type}" }
+  end
+
+  def list_train
+    puts trains_list
+    puts 'Выберите поезд: '
+    train = gets.chomp.to_i
+    puts "Поезд номер: #{@trains[train - 1].num}"
+    puts "тип: #{@trains[train - 1].type}"
+    puts "текущая скорость: #{@trains[train - 1].speed}"
+    puts "вагоны: #{@trains[train - 1].vans.map(&:num)}"
+  end
+
+  def list_route
+    puts route_list
+    puts 'Выберите маршрут: '
+    route = gets.chomp.to_i
+    puts "Полный маршрут: #{@routes[route - 1].full_route.map(&:name)}"
+  end
+
+  def list_vans
+    puts trains_list
+    puts 'Выберите поезд: '
+    train = gets.chomp.to_i
+    if @trains[train - 1].type == :cargo
+      @trains[train - 1].vans_iterator do |van|
+        puts "Вагон №#{van.num}, тип: #{van.type}, занято: #{van.occupied_volume}, свободно: #{van.free_volume}"
+      end
+    else
+      @trains[train - 1].vans_iterator do |van|
+        puts "Вагон №#{van.num}, тип: #{van.type}, занято: #{van.occupied_seats}, свободно: #{van.avaliable_seats}"
       end
     end
   end
