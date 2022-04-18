@@ -3,6 +3,8 @@ require_relative 'train'
 require_relative 'route'
 require_relative 'vans'
 require_relative 'modules'
+require_relative 'accessors'
+require_relative 'validation'
 
 class RailRoad
   attr_reader :stations, :trains, :routes, :vans
@@ -416,24 +418,24 @@ class RailRoad
     end
   end
 
-  # def seed
-  #   @stations << Station.new('Москва')
-  #   @stations << Station.new('Самара')
-  #   @stations << Station.new('Тамбов')
-  #   @stations << Station.new('Воронеж')
-  #   @stations << Station.new('Иркутск')
-  #   @trains << PassengerTrain.new(33_333)
-  #   @trains << CargoTrain.new(88_855)
-  #   @vans << CargoVan.new(88, 45)
-  #   @vans << PassengerVan.new(34, 80)
-  #   @vans << PassengerVan.new(35, 90)
-  #   @vans << PassengerVan.new(36, 58)
-  #   @routes << Route.new(@stations[0], stations[1])
-  #   @trains[0].on_route(@routes[0])
-  #   @routes[0].add_station(@stations[2])
-  #   @routes[0].add_station(@stations[3])
-  #   @trains[0].add_van(@vans[1])
-  #   @trains[0].add_van(@vans[2])
-  #   @trains[0].add_van(@vans[3])
-  # end
+  def seed
+    @stations << Station.new('Москва')
+    @stations << Station.new('Самара')
+    @stations << Station.new('Тамбов')
+    @stations << Station.new('Воронеж')
+    @stations << Station.new('Иркутск')
+    @trains << PassengerTrain.new(33_333)
+    @trains << CargoTrain.new(88_855)
+    @vans << CargoVan.new(88, 45)
+    @vans << PassengerVan.new(34, 80)
+    @vans << PassengerVan.new(35, 90)
+    @vans << PassengerVan.new(36, 58)
+    @routes << Route.new(@stations[0], stations[1])
+    @trains[0].on_route(@routes[0])
+    @routes[0].add_station(@stations[2])
+    @routes[0].add_station(@stations[3])
+    @trains[0].add_van(@vans[1])
+    @trains[0].add_van(@vans[2])
+    @trains[0].add_van(@vans[3])
+  end
 end

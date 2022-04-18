@@ -1,19 +1,21 @@
 require_relative 'modules'
+require_relative 'accessors'
+require_relative 'validation'
+
 
 class Van
   include Factory
+  include Accessors
+  include Validation
+
   attr_reader :num, :type, :seats
+
+  validate :clas, :type, "Van"
 
   @attempt = 0
 
   def initialize(num, _seats = 'Unknown', _volume = 'Unknown')
     @num = num.to_i
-  end
-
-  protected
-
-  def validate!
-    raise 'Номер не может быть 0 или иметь отрицательное значение' if num <= 0
   end
 end
 
