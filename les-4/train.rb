@@ -1,8 +1,12 @@
 require_relative 'modules'
+require_relative 'accessors'
+require_relative 'validation'
 
 class Train
   include Factory
   include InstanceCounter
+  include Accessors
+  include Validation
 
   TRAIN_NUMBER = /^\w{3}-?\w{2}/.freeze
   # rubocop:disable Style/ClassVars
@@ -12,6 +16,9 @@ class Train
   # rubocop:enable Style/ClassVars
 
   attr_reader :speed, :vans, :type, :get_route, :train_route, :current_station, :num
+
+  validate :num, :presence
+
 
   def self.find(number)
     @@train_list.find do |train|
@@ -24,6 +31,7 @@ class Train
     @speed = speed
     @vans = []
     @type = type
+    validate!
     register_instance
     @@train_list << self
     @@trains_number << self.num
@@ -83,12 +91,6 @@ class Train
 
   def vans_iterator(&block)
     @vans.each(&block) if block_given?
-  end
-
-  protected
-
-  def validate!
-    raise 'Не правильный формат номера поезда' if @num.to_s !~ TRAIN_NUMBER
   end
 end
 

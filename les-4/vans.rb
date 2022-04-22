@@ -10,11 +10,9 @@ class Van
 
   attr_reader :num, :type, :seats
 
-  validate :clas, :type, "Van"
-
   @attempt = 0
 
-  def initialize(num, _seats = 'Unknown', _volume = 'Unknown')
+  def initialize(num, seats = 'Unknown', volume = 'Unknown')
     @num = num.to_i
   end
 end
@@ -22,13 +20,16 @@ end
 class PassengerVan < Van
   attr_reader :num, :type, :seats, :occupied_seats, :available_seats
 
+  validate :name, :presence
+  validate :name, :type, "String"
+
   def initialize(num, seats)
     super
     @seats = seats
-    validate!
     @type = :passenger
-    message
     @occupied_seats = 0
+    validate!
+    message
   end
 
   def take_seat

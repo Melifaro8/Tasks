@@ -1,12 +1,18 @@
 # frozen_string_literal: true
 
 require_relative 'modules'
+require_relative 'accessors'
+require_relative 'validation'
 
 class Station
   include Factory
   include InstanceCounter
+  include Accessors
+  include Validation
 
   attr_reader :train_list, :name
+
+  validate :name, :presence
 
   # rubocop:disable Style/ClassVars
   @@station_list = []
@@ -19,10 +25,10 @@ class Station
 
   def initialize(name)
     @name = name
-    validate!
     @train_list = []
     @@station_list << self
     register_instance
+    validate!
     message
   end
 
@@ -43,10 +49,6 @@ class Station
   end
 
   protected
-
-  def validate!
-    raise 'Название станции не может быть пустым' if @name.empty?
-  end
 
   def message
     puts "Станция #{name} успешно создана!"

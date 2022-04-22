@@ -13,19 +13,19 @@ module Accessors
         define_method("#{name}_history") { instance_variable_get(history_name) }
 
         define_method("#{name}=".to_sym) do |value|
+          instance_variable_set(var_name, value)
           if instance_variable_get(history_name).nil?
             instance_variable_set(history_name, [instance_variable_get(var_name)])
           else
             instance_variable_get(history_name) << instance_variable_get(var_name)
           end
-          instance_variable_set(var_name, value)
         end
       end
     end
-    
+
     def strong_attr_accessor(name, type)
       name = "@#{name}"
-      define_method(name) {instance_variable_get(name)}
+      define_method(name) { instance_variable_get(name) }
       define_method("@#{name}=".to_sym) do |value|
         if value.is_a?(type)
           instance_variable_set(name, value)

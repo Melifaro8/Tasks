@@ -1,6 +1,11 @@
 require_relative 'modules'
+require_relative 'accessors'
+require_relative 'validation'
 
 class Route
+  include Accessors
+  include Validation
+
   attr_reader :start_station, :final_station, :way_station
 
   @attempt = 0
@@ -26,10 +31,6 @@ class Route
   end
 
   protected
-
-  def validate!
-    raise 'Начальная и конечная станции не могут совпадать' if start_station.name == final_station.name
-  end
 
   def message
     puts "Создан маршрут от #{@start_station.name} до #{@final_station.name}"
